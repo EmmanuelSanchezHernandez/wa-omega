@@ -1,0 +1,25 @@
+#!/bin/bash
+# Ayudante del oido de Omega.
+#   wa-omega vincular   — en una TERMINAL REAL (SSH / Specter): para el servicio, muestra el QR, guarda la sesion
+#                         y vuelve a arrancar el servicio.
+#   wa-omega estado     — conectado o no, y desde cuando (sin numeros ni textos).
+set -u
+case "${1:-}" in
+  vincular)
+    [ -t 0 ] && [ -t 1 ] || { echo "hay que correrlo en una terminal real (SSH o Specter), no con !"; exit 2; }
+    systemctl stop wa-omega.service 2>/dev/null
+    runuser -u waomega -- env WA_OMEGA_ESTADO=/var/lib/wa-omega /usr/bin/node /srv/wa-omega/oido.mjs vincular
+    rc=$?
+    systemctl enable --now wa-omega.service
+    exit $rc ;;
+  estado)
+    python3 -c '
+import json, time
+try:
+    d = json.load(open("/var/lib/wa-omega/estado.json"))
+except Exception:
+    print("sin estado (el servicio no ha arrancado o no esta vinculado)"); raise SystemExit(0)
+print("conectado:", d.get("conectado"), "| motivo:", d.get("motivo"), "| hace", int(time.time() - d.get("ts", 0) / 1000), "s")'
+    systemctl is-active wa-omega.service ;;
+  *) echo "uso: wa-omega vincular | estado"; exit 2 ;;
+esac

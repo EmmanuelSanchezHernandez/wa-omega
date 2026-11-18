@@ -1,0 +1,12 @@
+{
+  "name": "wa-omega",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Oido propio de Omega: WhatsApp (dispositivo vinculado) sin el agente. 21-oct-2026.",
+  "type": "module",
+  "main": "oido.mjs",
+  "dependencies": {
+    "@whiskeysockets/baileys": "7.0.0-rc14",
+    "qrcode-terminal": "0.12.0"
+  }
+}
